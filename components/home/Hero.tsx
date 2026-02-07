@@ -5,7 +5,7 @@ import { Play, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-heritage-red via-red-600 to-heritage-gold min-h-[90vh] flex items-center nepali-pattern">
+    <section className="relative overflow-hidden bg-heritage-red min-h-[90vh] flex items-center nepali-pattern">
       {/* Background Pattern Overlay */}
       <div className="absolute inset-0 bg-black/20"></div>
 
