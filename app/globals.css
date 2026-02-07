@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-poppins: 'Poppins', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+
+  --color-heritage-red: #DC143C;
+  --color-heritage-gold: #FF9933;
+  --color-tech-blue: #1A237E;
+  --color-tech-purple: #6B46C1;
+  --color-warm: #FAF9F6;
+  --color-success: #2ECC71;
+  --color-alert: #F39C12;
+  --color-esewa: #60BB46;
+  --color-khalti: #5D2E8E;
+}
+
+body {
+  font-family: var(--font-inter);
+  color: #111827;
+  background-color: var(--color-warm);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins);
+}
+
+.btn-primary {
+  background-color: var(--color-heritage-red);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+  transform-origin: center;
+}
+
+.btn-primary:hover {
+  background-color: #b91c1c;
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--color-heritage-red);
+  border: 2px solid var(--color-heritage-red);
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background-color: #f9fafb;
+}
+
+.section-padding {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+.container-custom {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.text-gradient {
+  background-image: linear-gradient(to right, var(--color-heritage-red), var(--color-heritage-gold), var(--color-tech-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nepali-pattern {
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(220, 20, 60, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 153, 51, 0.03) 0%, transparent 50%);
+}

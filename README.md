@@ -1,0 +1,116 @@
+# Kirana Digital - MVP Demo Website
+
+A modern, lightweight Next.js website showcasing digital transformation solutions for traditional Kirana shops in Nepal.
+
+## 🚀 Features
+
+- **Modern Design**: Clean, professional SaaS-style layout with Nepali cultural elements
+- **Fully Responsive**: Mobile-first design that works on all devices
+- **Lightweight**: Optimized for fast loading
+- **MVP/Demo**: All data is mocked, no backend required
+
+## 📋 Pages
+
+- **Home**: Hero, stats, solutions overview, testimonials, pricing preview
+- **Solutions**: Detailed breakdown of all 5 digital solutions
+- **Pricing**: Transparent pricing tiers with ROI calculator
+- **Contact**: Contact form and multiple contact methods
+- **About**: Company story, team, values, and impact metrics
+
+## 🎨 Design System
+
+### Colors
+- **Heritage Red**: #DC143C (Traditional Nepali crimson)
+- **Saffron Gold**: #FF9933 (Prosperity, traditional)
+- **Deep Blue**: #1A237E (Trust, technology)
+- **Modern Purple**: #6B46C1 (Innovation)
+
+### Typography
+- **Headings**: Poppins
+- **Body**: Inter
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS 4
+- **Language**: TypeScript
+- **Icons**: Lucide React
+
+## 📦 Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🌐 Local Development
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the website.
+
+## 📱 Key Components
+
+### Homepage Sections
+- Hero with CTA
+- Animated Stats Bar
+- Problem Statement
+- Solutions Overview
+- Social Proof (Testimonials)
+- How It Works (4-step process)
+- Technology Showcase
+- Pricing Preview
+- Final CTA
+
+### Reusable Components
+- Navigation (sticky header with dropdown menus)
+- Footer (comprehensive with trust badges)
+
+## 🎯 Design Philosophy
+
+**"Heritage Meets Innovation"**
+
+The website blends traditional Nepali aesthetics with modern tech design:
+- Color palette inspired by Nepal
+- Bilingual content (English + Nepali)
+- Imagery showing elderly shop owners with modern technology
+- Subtle Nepali patterns and cultural elements
+- Warm, respectful tone perfect for elderly audience
+
+## 📝 Content Strategy
+
+- **Empathetic**: Understands challenges of traditional shops
+- **Clear**: Simple language, avoiding technical jargon
+- **Trustworthy**: Transparent pricing, real testimonials
+- **Bilingual**: Key phrases in both English and Nepali
+- **Results-Focused**: Emphasizes ROI and real outcomes
+
+## 🚀 Future Enhancements (Not in MVP)
+
+- Backend integration
+- Real contact form submission
+- Interactive ROI calculator with live results
+- Video demos and testimonials
+- Blog functionality
+- Multi-language toggle (full EN/NP switch)
+- Analytics integration
+- SEO optimization
+
+## 📄 License
+
+This is a demo project created for showcase purposes.
+
+## 🤝 Contributing
+
+This is an MVP demo. For the full implementation, additional features and backend integration would be added.
+
+---
+
+**Built with ❤️ for Nepal's किराना Heritage**
