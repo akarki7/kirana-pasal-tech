@@ -4,10 +4,21 @@ A modern, lightweight Next.js website showcasing digital transformation solution
 
 ## 🚀 Features
 
+### Marketing Website
 - **Modern Design**: Clean, professional SaaS-style layout with Nepali cultural elements
 - **Fully Responsive**: Mobile-first design that works on all devices
 - **Lightweight**: Optimized for fast loading
 - **MVP/Demo**: All data is mocked, no backend required
+
+### Functional Features
+- **POS System** (`/pos`): Complete point-of-sale with cart, checkout, and payment integration
+- **Admin Dashboard** (`/admin`): Product management (CRUD), analytics, AI insights
+- **Payment Gateways**: Realistic eSewa, Khalti, Fonepay, ConnectIPS integration with QR codes
+- **WhatsApp Integration**: Automatic receipt sending (mock API for demo)
+- **AI Inventory Management**: Demand forecasting and reorder suggestions
+- **Voice Alerts**: Payment notifications in Nepali
+- **Barcode Scanner**: Product scanning simulation
+- **Local Storage**: All data persisted in browser (no backend needed)
 
 ## 📋 Pages
 
@@ -55,6 +66,36 @@ npm start
 ## 🌐 Local Development
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the website.
+
+## 🚀 Deployment
+
+This project includes automatic build via GitHub Actions on every push to `main`.
+
+### Quick Deploy
+
+Choose your platform:
+- **GitHub Pages**: Free, perfect for demos
+- **Netlify**: Free tier, easy setup
+- **Railway**: Great for full-stack apps
+- **Self-hosted**: Full control
+
+### Automated Build
+
+Every push to `main` branch:
+1. ✅ Automatically builds your project
+2. ✅ Runs type checking
+3. ✅ Creates deployable artifacts
+4. ✅ Ready for any hosting platform
+
+### Detailed Instructions
+
+See **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** for:
+- GitHub Pages setup
+- Netlify, Railway, and self-hosted options
+- GitHub Actions workflow details
+- Environment variables configuration
+- Custom domain setup
+- Troubleshooting tips
 
 ## 📱 Key Components
 
