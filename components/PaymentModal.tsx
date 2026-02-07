@@ -49,8 +49,14 @@ export default function PaymentModal({ amount, orderId, method, onSuccess, onCan
         break;
     }
     setPaymentData(data);
-    setTimeLeft(data.expiresIn || 300);
-    setTransactionId(data.transactionUuid || data.pidx || data.prn || data.txnId);
+    setTimeLeft('expiresIn' in data ? data.expiresIn : 300);
+    setTransactionId(
+      ('transactionUuid' in data && data.transactionUuid) ||
+      ('pidx' in data && data.pidx) ||
+      ('prn' in data && data.prn) ||
+      ('txnId' in data && data.txnId) ||
+      ''
+    );
   };
 
   const handlePayNow = async () => {

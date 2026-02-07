@@ -31,7 +31,7 @@ export interface Order {
   subtotal: number;
   tax: number;
   total: number;
-  paymentMethod: 'cash' | 'esewa' | 'khalti' | 'bank' | 'credit';
+  paymentMethod: 'cash' | 'esewa' | 'khalti' | 'fonepay' | 'connectips' | 'credit';
   paymentStatus: 'pending' | 'completed' | 'failed';
   customerName?: string;
   customerPhone?: string;
