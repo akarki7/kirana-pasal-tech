@@ -9,25 +9,22 @@ import {
   Trash2,
   Search,
   Scan,
-  CreditCard,
   Smartphone,
   Banknote,
-  Check,
-  X,
-  MessageSquare,
-  Volume2,
+  CreditCard,
 } from 'lucide-react';
 import { storage } from '@/lib/storage';
-import { PaymentService, WhatsAppService, VoiceAlertService, BarcodeScannerService } from '@/lib/integrations';
+import { WhatsAppService, VoiceAlertService, BarcodeScannerService } from '@/lib/integrations';
 import { Product, Order, OrderItem } from '@/types';
+import PaymentModal from '@/components/PaymentModal';
 
 export default function POSSystem() {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPayment, setSelectedPayment] = useState<'cash' | 'esewa' | 'khalti' | 'bank' | 'credit'>('cash');
-  const [showPayment, setShowPayment] = useState(false);
-  const [processing, setProcessing] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<'cash' | 'esewa' | 'khalti' | 'fonepay' | 'connectips' | 'credit'>('cash');
+  const [showPaymentSelection, setShowPaymentSelection] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerName, setCustomerName] = useState('');
 
@@ -112,7 +109,7 @@ export default function POSSystem() {
 
   const calculateTotal = () => {
     const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
-    const tax = subtotal * 0.13; // 13% VAT
+    const tax = subtotal * 0.13;
     return { subtotal, tax, total: subtotal + tax };
   };
 
@@ -129,36 +126,35 @@ export default function POSSystem() {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleProceedToPayment = () => {
     if (cart.length === 0) {
       alert('Cart is empty!');
       return;
     }
+    setShowPaymentSelection(true);
+  };
 
-    setProcessing(true);
+  const handlePaymentMethodSelected = (method: typeof selectedPayment) => {
+    setSelectedPayment(method);
 
+    if (method === 'cash' || method === 'credit') {
+      // Direct checkout for cash and credit
+      completeOrder(method);
+    } else {
+      // Show payment modal for digital payments
+      setShowPaymentSelection(false);
+      setShowPaymentModal(true);
+    }
+  };
+
+  const handlePaymentSuccess = async (transactionId: string) => {
+    setShowPaymentModal(false);
+    await completeOrder(selectedPayment, transactionId);
+  };
+
+  const completeOrder = async (paymentMethod: typeof selectedPayment, transactionId?: string) => {
     try {
-      // Process payment
       const { subtotal, tax, total } = calculateTotal();
-
-      if (selectedPayment !== 'cash') {
-        const paymentResult = await PaymentService.processPayment(
-          total,
-          selectedPayment as 'esewa' | 'khalti' | 'bank' | 'connectips'
-        );
-
-        if (!paymentResult.success) {
-          alert(paymentResult.message);
-          setProcessing(false);
-          return;
-        }
-
-        // Play voice alert for digital payment
-        VoiceAlertService.playAlert(
-          VoiceAlertService.formatPaymentAlert(selectedPayment, total, 'nepali'),
-          'nepali'
-        );
-      }
 
       // Create order
       const order: Order = {
@@ -167,7 +163,7 @@ export default function POSSystem() {
         subtotal,
         tax,
         total,
-        paymentMethod: selectedPayment,
+        paymentMethod,
         paymentStatus: 'completed',
         customerName: customerName || undefined,
         customerPhone: customerPhone || undefined,
@@ -188,26 +184,41 @@ export default function POSSystem() {
         }
       });
 
+      // Play voice alert for digital payments
+      if (paymentMethod !== 'cash' && paymentMethod !== 'credit') {
+        VoiceAlertService.playAlert(
+          VoiceAlertService.formatPaymentAlert(paymentMethod, total, 'nepali'),
+          'nepali'
+        );
+      }
+
       // Send WhatsApp confirmation if phone provided
       if (customerPhone) {
-        const message = WhatsAppService.formatOrderConfirmation(order, customerPhone);
+        const message = WhatsAppService.formatOrderConfirmation(order, customerPhone, transactionId);
         await WhatsAppService.sendMessage(customerPhone, message, 'order_confirmation');
+        console.log('📱 WhatsApp Receipt:', message);
       }
 
       // Success!
-      alert(`✅ Order completed!\nTotal: ₹${total.toFixed(2)}\nPayment: ${selectedPayment.toUpperCase()}`);
+      alert(
+        `✅ Order completed successfully!\n\n` +
+        `Order ID: #${order.id}\n` +
+        `Total: ₹${total.toFixed(2)}\n` +
+        `Payment: ${paymentMethod.toUpperCase()}` +
+        (transactionId ? `\nTransaction ID: ${transactionId}` : '') +
+        (customerPhone ? '\n\n📱 Receipt sent via WhatsApp' : '')
+      );
 
       // Reset
       setCart([]);
       setCustomerPhone('');
       setCustomerName('');
-      setShowPayment(false);
+      setShowPaymentSelection(false);
+      setShowPaymentModal(false);
       loadProducts();
     } catch (error) {
       alert('Error processing order. Please try again.');
       console.error(error);
-    } finally {
-      setProcessing(false);
     }
   };
 
@@ -378,7 +389,7 @@ export default function POSSystem() {
 
                   <div className="p-6 border-t">
                     <button
-                      onClick={() => setShowPayment(true)}
+                      onClick={handleProceedToPayment}
                       className="w-full bg-success hover:bg-green-700 text-white py-4 rounded-lg font-bold text-lg transition-colors flex items-center justify-center"
                     >
                       <CreditCard className="mr-2" size={24} />
@@ -392,13 +403,13 @@ export default function POSSystem() {
         </div>
       </div>
 
-      {/* Payment Modal */}
-      {showPayment && (
+      {/* Payment Method Selection Modal */}
+      {showPaymentSelection && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-2xl w-full">
             <div className="p-6 border-b bg-gradient-to-r from-heritage-red to-heritage-gold text-white rounded-t-xl">
-              <h2 className="text-2xl font-bold">Complete Payment</h2>
-              <p className="text-white/90">भुक्तानी पूरा गर्नुहोस्</p>
+              <h2 className="text-2xl font-bold">Select Payment Method</h2>
+              <p className="text-white/90">भुक्तानी विधि छान्नुहोस्</p>
             </div>
 
             <div className="p-6 space-y-6">
@@ -423,44 +434,65 @@ export default function POSSystem() {
                 </div>
               </div>
 
-              {/* Payment Method */}
+              {/* Payment Methods */}
               <div>
-                <h3 className="font-bold text-lg mb-4">Select Payment Method</h3>
+                <h3 className="font-bold text-lg mb-4">Choose Payment Method</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {[
-                    { id: 'cash', icon: <Banknote size={32} />, label: 'Cash', color: 'bg-gray-100' },
-                    { id: 'esewa', icon: <Smartphone size={32} />, label: 'eSewa', color: 'bg-esewa/10' },
-                    { id: 'khalti', icon: <Smartphone size={32} />, label: 'Khalti', color: 'bg-khalti/10' },
-                    { id: 'bank', icon: <CreditCard size={32} />, label: 'Bank Transfer', color: 'bg-blue-100' },
-                    { id: 'credit', icon: <CreditCard size={32} />, label: 'Credit (उधारो)', color: 'bg-yellow-100' },
-                  ].map(method => (
-                    <button
-                      key={method.id}
-                      onClick={() => setSelectedPayment(method.id as any)}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        selectedPayment === method.id
-                          ? 'border-heritage-red bg-heritage-red/10'
-                          : 'border-gray-200 hover:border-gray-300'
-                      } ${method.color}`}
-                    >
-                      <div className="flex flex-col items-center space-y-2">
-                        {method.icon}
-                        <span className="font-semibold">{method.label}</span>
-                      </div>
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => handlePaymentMethodSelected('cash')}
+                    className="p-6 rounded-xl border-2 border-gray-200 hover:border-heritage-red hover:bg-gray-50 transition-all group"
+                  >
+                    <Banknote className="mx-auto mb-3 text-gray-700 group-hover:text-heritage-red" size={40} />
+                    <div className="font-semibold">Cash</div>
+                    <div className="text-sm text-gray-600">नगद</div>
+                  </button>
+
+                  <button
+                    onClick={() => handlePaymentMethodSelected('esewa')}
+                    className="p-6 rounded-xl border-2 border-gray-200 hover:border-[#60BB46] hover:bg-green-50 transition-all group"
+                  >
+                    <div className="text-4xl mb-3">💚</div>
+                    <div className="font-semibold">eSewa</div>
+                    <div className="text-sm text-gray-600">Digital Wallet</div>
+                  </button>
+
+                  <button
+                    onClick={() => handlePaymentMethodSelected('khalti')}
+                    className="p-6 rounded-xl border-2 border-gray-200 hover:border-[#5D2E8E] hover:bg-purple-50 transition-all group"
+                  >
+                    <div className="text-4xl mb-3">💜</div>
+                    <div className="font-semibold">Khalti</div>
+                    <div className="text-sm text-gray-600">Digital Wallet</div>
+                  </button>
+
+                  <button
+                    onClick={() => handlePaymentMethodSelected('fonepay')}
+                    className="p-6 rounded-xl border-2 border-gray-200 hover:border-[#ED1C24] hover:bg-red-50 transition-all group"
+                  >
+                    <div className="text-4xl mb-3">🔴</div>
+                    <div className="font-semibold">Fonepay</div>
+                    <div className="text-sm text-gray-600">QR Payment</div>
+                  </button>
+
+                  <button
+                    onClick={() => handlePaymentMethodSelected('connectips')}
+                    className="p-6 rounded-xl border-2 border-gray-200 hover:border-[#0066CC] hover:bg-blue-50 transition-all group"
+                  >
+                    <Smartphone className="mx-auto mb-3 text-gray-700 group-hover:text-blue-600" size={40} />
+                    <div className="font-semibold">ConnectIPS</div>
+                    <div className="text-sm text-gray-600">Bank Transfer</div>
+                  </button>
+
+                  <button
+                    onClick={() => handlePaymentMethodSelected('credit')}
+                    className="p-6 rounded-xl border-2 border-gray-200 hover:border-heritage-gold hover:bg-yellow-50 transition-all group"
+                  >
+                    <CreditCard className="mx-auto mb-3 text-gray-700 group-hover:text-heritage-gold" size={40} />
+                    <div className="font-semibold">Credit</div>
+                    <div className="text-sm text-gray-600">उधारो</div>
+                  </button>
                 </div>
               </div>
-
-              {/* Payment Instructions */}
-              {selectedPayment !== 'cash' && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">Payment Instructions:</h4>
-                  <p className="text-sm text-gray-700 whitespace-pre-line">
-                    {PaymentService.getPaymentInstructions(selectedPayment, total)}
-                  </p>
-                </div>
-              )}
 
               {/* Total */}
               <div className="bg-heritage-red/10 p-4 rounded-lg">
@@ -470,34 +502,30 @@ export default function POSSystem() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleCheckout}
-                  disabled={processing}
-                  className="flex-1 bg-success hover:bg-green-700 disabled:bg-gray-400 text-white py-4 rounded-lg font-bold text-lg transition-colors flex items-center justify-center"
-                >
-                  {processing ? (
-                    <>Processing...</>
-                  ) : (
-                    <>
-                      <Check className="mr-2" size={24} />
-                      Complete Order
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => setShowPayment(false)}
-                  disabled={processing}
-                  className="px-8 bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 rounded-lg font-bold transition-colors flex items-center justify-center"
-                >
-                  <X className="mr-2" size={24} />
-                  Cancel
-                </button>
-              </div>
+              {/* Cancel Button */}
+              <button
+                onClick={() => setShowPaymentSelection(false)}
+                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-bold transition-colors"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Realistic Payment Modal */}
+      {showPaymentModal && (
+        <PaymentModal
+          amount={total}
+          orderId={Date.now().toString()}
+          method={selectedPayment as 'esewa' | 'khalti' | 'fonepay' | 'connectips'}
+          onSuccess={handlePaymentSuccess}
+          onCancel={() => {
+            setShowPaymentModal(false);
+            setShowPaymentSelection(true);
+          }}
+        />
       )}
     </div>
   );
